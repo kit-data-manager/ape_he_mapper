@@ -1,8 +1,8 @@
-<!--![Tests](https://github.com/kit-data-manager/tomo_mapper/actions/workflows/python-app.yml/badge.svg)-->
-<!--![Tests](https://img.shields.io/github/actions/workflow/status/kit-data-manager/tomo_mapper/python-app.yml?label=Tests)
+<!--![Tests](https://github.com/kit-data-manager/ape_he_mapper/actions/workflows/python-app.yml/badge.svg)-->
+<!--![Tests](https://img.shields.io/github/actions/workflow/status/kit-data-manager/ape_he_mapper/python-app.yml?label=Tests)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)-->
 
-# APE-HE Beamline Mapper
+# APE-HE Mapper
 
 ## Overview
 APE-HE Mapper is a tool designed for mapping APE-HE (Advanced Photoelectric Effect - High Energy) metadata to a uniform, schema-compliant json format. This project includes the extraction of metadata from NeXus (.nxs) files and can be extended for other existing formats.
