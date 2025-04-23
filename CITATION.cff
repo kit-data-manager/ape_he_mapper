@@ -1,36 +1,38 @@
 cff-version: 1.2.0
 message: If you use this software, please cite it using these metadata.
 type: software
-title: APE-HE Beamline mapper
-abstract: APE-HE Mapper is a tool designed for mapping APE-HE (Advanced Photoelectric Effect - High Energy) metadata to a uniform, schema-compliant json format. This project includes the extraction of metadata from NeXus (.nxs) files and can be extended for other existing formats.
-version: 0.0.1-SNAPSHOT
+title: APE-HE mapper
+abstract: APE-HE Mapper is a tool designed for mapping APE-HE (Advanced Photoelectric
+  Effect - High Energy) metadata to a uniform, schema-compliant json format.
+version: v0.0.1-SNAPSHOT
 keywords:
-- APE-HE
-- neXus
-- metadata
-- extraction
-- schema
+  - APE-HE
+  - neXus
+  - metadata
+  - extraction
+  - schema
 authors:
-- orcid: https://orcid.org/0000-0002-6745-3464
-  given-names: Gabin Thibaut
-  family-names: Oumbe Tekam
-- orcid: https://orcid.org/0000-0003-3974-3728
-  given-names: Germaine
-  family-names: Götzelmann
-- orcid: https://orcid.org/0000-0002-6368-2067
-  given-names: Irene
-  family-names: Modolo
-- orcid: https://orcid.org/0000-0003-2534-0063
-  given-names: Rossella
-  family-names: Aversa
-- given-names: Dario
-  family-names: De Angelis
+  - orcid: https://orcid.org/0000-0002-6745-3464
+    given-names: Gabin Thibaut
+    family-names: Oumbe Tekam
+  - orcid: https://orcid.org/0000-0003-3974-3728
+    given-names: Germaine
+    family-names: Götzelmann
+  - orcid: https://orcid.org/0000-0003-2534-0063
+    given-names: Rossella
+    family-names: Aversa
+  - given-names: Dario
+    family-names: De Angelis
+    orcid: https://orcid.org/0000-0001-9199-6373
+  - family-names: Modolo
+    orcid: https://orcid.org/0000-0002-9576-8615
+    given-names: Irene
 contact:
-- orcid: https://orcid.org/0000-0002-6745-3464
-  given-names: Gabin Thibaut
-  family-names: Oumbe Tekam
-- orcid: https://orcid.org/0000-0003-3974-3728
-  given-names: Germaine
-  family-names: Götzelmann
+  - orcid: https://orcid.org/0000-0002-6745-3464
+    given-names: Gabin Thibaut
+    family-names: Oumbe Tekam
+  - orcid: https://orcid.org/0000-0003-3974-3728
+    given-names: Germaine
+    family-names: Götzelmann
 license: Apache-2.0
-repository-code: https://github.com/kit-data-manager/tomo_mapper
+repository-code: https://github.com/kit-data-manager/ape_he_mapper

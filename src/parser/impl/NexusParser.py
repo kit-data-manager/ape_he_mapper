@@ -13,8 +13,6 @@ import configparser
 
 
 
-#TODO: would this have any benefit from replacing with tifffile lib?
-
 class NexusParser(ImageParser):
 
     internal_mapping = None
@@ -30,7 +28,7 @@ class NexusParser(ImageParser):
 
     def parse(self, file_path, mapping) -> tuple[ImageMD, str]:
         input_md = self._read_input_file(file_path)
-        #print("<<INPUT>>",input_md, "\n")
+
         if not input_md:
             logging.warning("No metadata extractable from {}".format(file_path))
             return None, None
