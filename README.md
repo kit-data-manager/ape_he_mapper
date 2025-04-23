@@ -57,8 +57,6 @@ The mapper expects a map file, a zip file, and a zip output path:
 python -m mapping_cli <path_to_schema.json> <path_to_zipped_NeXus_files.zip> <output_document.zip>
 ```
 
-For further information about the necessary map file, see [Parsing README](./src/resources/maps/parsing)
-
 For further information about mappings used internally, see [Mapping README](./src/resources/maps/mapping)
 
 ### 2. Command Line Interface Executable
