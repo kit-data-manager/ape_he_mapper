@@ -60,6 +60,11 @@ class NexusParser(ImageParser):
         md = file_path
 
         output_dict = {}
-        output_dict.update(input_to_dict(md))
+        parsed_dict = input_to_dict(md)
 
+        if parsed_dict is None:
+            logging.error(f"Not able to parse {md}.")
+            return None
+
+        output_dict.update(parsed_dict)
         return output_dict
