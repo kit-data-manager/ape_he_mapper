@@ -24,7 +24,11 @@ class InputReader:
 
         if not self.parser_names:
             logging.error("No applicable parsers found for input {}".format(input_path))
-            mimetype_set = list(set([v.expected_input_format() for v in ParserFactory.available_img_parsers.values()]))
+            #mimetype_set = list(set([v.expected_input_format() for v in ParserFactory.available_img_parsers.values()]))
+            mimetype_set = list({mt for v in ParserFactory.available_img_parsers.values() 
+                                 for mt in (v.expected_input_format() if isinstance(v.expected_input_format(), list) 
+                                            else [v.expected_input_format()])})
+
             logging.info("Supported mimetypes: {}".format(mimetype_set))
             raise MappingAbortionError("Input file parsing aborted.")
         logging.info("Applicable parsers: {}".format(", ".join(self.parser_names)))
@@ -42,7 +46,7 @@ class InputReader:
         if not mt or mt == "application/unknown": #fallback, especially if file extension is not available
             #Text files are tricky with magica, so try to read as such first
             mt = get_filetype_with_magica(input_path)
-            if mt != "application/octet-stream" and "image/" not in mt:
+            if mt not in ["application/octet-stream", "application/x-hdf5"] and "image/" not in mt:
                 try:
                     robust_textfile_read(input_path)
                     mt = "application/octet-stream"
@@ -55,7 +59,7 @@ class InputReader:
         available_parsers = []
         for k, p in ParserFactory.available_img_parsers.items():
             expected = p.expected_input_format()
-            if expected == mt:
+            if mt in expected:
                 available_parsers.append(k)
         return available_parsers
 
