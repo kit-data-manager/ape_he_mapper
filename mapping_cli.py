@@ -71,6 +71,11 @@ def run_mapper(args):
             if success_count > 0:
                 logging.info(f"In total {success_count} file(s) were successfully processed.")
                 OutputWriter.save_to_zip(list_of_file_names, OUTPUT_PATH)
+                try:
+                    shutil.rmtree(temp_dir)
+                    logging.info(f"The temporary folder '{temp_dir}' has been deleted.")
+                except Exception as e:
+                    logging.error(f"Failed to delete temporary folder: {e}")
             else:
                 logging.error("No files could be processed successfully. Aborting.")
                 sys.exit(1)

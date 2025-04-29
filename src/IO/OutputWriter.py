@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import zipfile
+import shutil
 
 from src.IO.MappingAbortionError import MappingAbortionError
 
@@ -32,5 +33,6 @@ class OutputWriter:
             for file_path in file_path_list:
                 os.remove(file_path)
                 logging.info(f"{file_path} has been deleted.")
+
         except Exception as e:
             logging.error(f"Failed to save to zip or delete files: {e}")

@@ -16,7 +16,7 @@ import configparser
 class NexusParser(ImageParser):
 
     internal_mapping = None
-    expected_input = "application/octet-stream"
+    #expected_input = "application/octet-stream"
 
     def __init__(self):
         m = input_to_dict(nexusparser_apeHe.read_text())
@@ -24,7 +24,7 @@ class NexusParser(ImageParser):
 
     @staticmethod
     def expected_input_format():
-        return "application/octet-stream"
+        return ["application/octet-stream", "application/x-hdf5"]
 
     def parse(self, file_path, mapping) -> tuple[ImageMD, str]:
         input_md = self._read_input_file(file_path)

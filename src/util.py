@@ -16,9 +16,6 @@ import numpy as np
 import requests
 import zipfile
 
-import xmltodict
-from xml.parsers.expat import ExpatError
-
 from src.IO.MappingAbortionError import MappingAbortionError
 
 def robust_textfile_read(filepath):
@@ -68,8 +65,6 @@ def extract_zip_file(zip_file_path):
         total_items = len(zip_ref.namelist())
 
         for index, file_name in enumerate(zip_ref.namelist(), start=1):
-            # if index%10 == 0:
-            #     print(f"Extracting file {index}/{total_items}...")
             file_path = os.path.join(temp_dir, file_name)
             zip_ref.extract(file_name, temp_dir)
 
@@ -140,19 +135,20 @@ def input_to_dict(stringPayload) -> Optional[dict]:
         return None
     #print("--------im trying--------------", stringPayload)
     try:
+        #print("----->", get_filetype_with_magica(stringPayload))
         if stringPayload.startswith("{"):
             try: #JSON
                 logging.info("Reading json file was successful!")
                 return json.loads(stringPayload)
             except JSONDecodeError:
                 logging.debug("Reading input as json not successful")
-        if get_filetype_with_magica(stringPayload) == "application/octet-stream":
+        if get_filetype_with_magica(stringPayload) in ["application/octet-stream", "application/x-hdf5"]:
             try: #NXS
                 with h5py.File(stringPayload, 'r') as f:
-                    logging.info("Reading neXus file was successful!")
+                    logging.info("Reading neXus/hdf5 file was successful!")
                     return _flat_to_nested_dict(_import_nxs_as_dict(f))
             except Exception as e:
-                logging.debug(f"Error reading Nexus file: {e}")
+                logging.debug(f"Error reading Nexus/hdf5 file: {e}")
     except Exception as e:
         logging.warning("Best effort input reading failed with unexpected error. Input malformed?")
         logging.error(e)
