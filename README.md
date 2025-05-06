@@ -10,7 +10,7 @@ APE-HE Mapper is a tool designed for mapping APE-HE (Advanced Photoelectric Effe
 The target format of the mapper follows pre-defined schemas developed for metadata description of APE-HE experiments.
 
 ## About APE-HE
-APE-HE is a beamline at the Elettra-Sincrotrone Trieste synchrotron, where a range of scientific techniques are performed. The current implementation supports techniques listed in the NeXus schema: `XAS`, `XMCD`, `IV CURVE`, `2D MAP`, which represent the subset of experiments that have been made FAIR-compliant so far.
+APE-HE is a beamline at the Elettra-Sincrotrone Trieste synchrotron, where a range of scientific techniques are performed. The current implementation supports techniques listed in the ape-he schema: `XAS`, `XMCD`, `IV CURVE`, `2D MAP`, which represent the subset of experiments that have been made FAIR-compliant so far.
 
 ## Usage
 
@@ -50,7 +50,7 @@ python -m mapping_cli <path_to_schema.json> <path_to_NeXus_file.nxs> <output_doc
 
 For further information about the necessary map file, see [Mapping README](./src/resources/maps/mapping)
 
-**2. For zipped files** (Under development)
+**2. For zipped file**
 
 The mapper expects a map file, a zip file, and a zip output path:
 ```
@@ -88,4 +88,6 @@ The following list provides the range of formats, that have been tested via samp
 - Elettra-Sincrotrone Trieste synchrotron
 
 ## Acknowlegdements
+This work was carried out with the support of the EU’s H2020 framework program for research and innovation under grant
+agreement n. 101007417, NFFA-Europe Pilot.
 
