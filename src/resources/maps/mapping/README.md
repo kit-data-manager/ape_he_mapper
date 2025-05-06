@@ -72,7 +72,7 @@ Output:
 
 ## Mapping Examples
 
-To explore the approach for various vendors and input formats, check the files in this folder. Currently, only one has been developed, but more can be added as needed.
+To explore the approach for various vendors and input formats, check the files in this folder. Currently, only one has been developed (**vendor:** Elettra-Sincrotrone Trieste synchrotron, **input format:** neXus), but more can be added as needed.
 
 ### FAQ
 
