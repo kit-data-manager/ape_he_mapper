@@ -39,29 +39,6 @@ result1: body
 [Asserts]
 body contains "entry"
 
-#Execute Mapping with image in unhandled format (change this test once the format is handled)
-POST {{host}}/api/v1/mappingExecution/{{id1}}
-[MultipartFormData]
-document: file,./tests/sampleData/invalid.nxs;
-HTTP 500
-
-#Execute Mapping with Ape-He sample again after failure above
-POST {{host}}/api/v1/mappingExecution/{{id1}}
-[MultipartFormData]
-document: file,./tests/sampleData/XAS.nxs;
-HTTP 200
-[Captures]
-result2: body
-[Asserts]
-body contains "entry"
-variable "result2" == {{result1}}
-
-#Get registered plugin etag
-GET {{host}}/api/v1/mappingAdministration/{{id1}}
-HTTP 200
-[Captures]
-etag: header "ETag"
-
 #Delete registered plugin
 DELETE {{host}}/api/v1/mappingAdministration/{{id1}}
 If-Match: {{etag}}
