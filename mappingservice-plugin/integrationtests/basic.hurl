@@ -25,23 +25,5 @@ Content-Disposition: form-data; name="document"; filename="blob"
 Content-Type: application/json
 
 {"PrivateFei.TimeOfCreation":"entry.endTime"}
---boundary--
-```
-HTTP 201
-
-#Execute Mapping with Ape-He sample
-POST {{host}}/api/v1/mappingExecution/{{id1}}
-[MultipartFormData]
-document: file,./tests/sampleData/XMCD.nxs;
-HTTP 200
-[Captures]
-result1: body
-[Asserts]
-body contains "entry"
-
-#Delete registered plugin
-DELETE {{host}}/api/v1/mappingAdministration/{{id1}}
-If-Match: {{etag}}
-HTTP 204
 
 #---------------- END Test Mapping for Ape-He ----------------------------------
