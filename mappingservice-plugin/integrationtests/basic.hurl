@@ -1,35 +1,37 @@
 #Mapping service is reachable before starting with plugin
-GET {{host}}
+GET {host}
 HTTP 200
 
-GET {{host}}/api/v1/mappingAdministration/types
+GET {host}/api/v1/mappingAdministration/types
 HTTP 200
 [Captures]
 mappingType: jsonpath "$[0].id"
 
 #---------------- BEGIN Test Mapping for Ape-He ----------------------------------
 
-#Register with a very small portion of real mapping file info as dummy mapping file
-POST {{host}}/api/v1/mappingAdministration/
+# Register a dummy mapping
+[Options]
+variable: id1=apeHe-{{mappingType}}-20250507T114106Z
+
+POST {host}/api/v1/mappingAdministration/
 Content-Type: multipart/form-data; boundary=boundary
-[Options] #set all variables you need for further use in this hurl script
-variable: id1=0
 ```
 --boundary
-Content-Disposition: form-data; name="record"; filename="blob"
+Content-Disposition: form-data; name="record"; filename="record.json"
 Content-Type: application/json
 
-{"mappingId":"{{id1}}","mappingType": "{{mappingType}}","title":"apeHe from CI test","description":"","acl":[]}
+{"mappingId":"{{id1}}","mappingType":"{{mappingType}}","title":"apeHe from CI test","description":"","acl":[]}
 --boundary
-Content-Disposition: form-data; name="document"; filename="blob"
+Content-Disposition: form-data; name="document"; filename="document.json"
 Content-Type: application/json
 
 {"PrivateFei.TimeOfCreation":"entry.endTime"}
+--boundary--
 ```
 HTTP 201
 
-#Execute Mapping with APE-HE sample
-POST {{host}}/api/v1/mappingExecution/{{id1}}
+# Execute mapping with Thermofisher sample
+POST {host}/api/v1/mappingExecution/{id1}
 [MultipartFormData]
 document: file,./tests/sampleData/XMCD.nxs;
 HTTP 200
