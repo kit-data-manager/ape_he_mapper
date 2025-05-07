@@ -26,5 +26,16 @@ Content-Type: application/json
 
 {"PrivateFei.TimeOfCreation":"entry.endTime"}
 ```
+HTTP 201
+
+#Execute Mapping with APE-HE sample
+POST {{host}}/api/v1/mappingExecution/{{id1}}
+[MultipartFormData]
+document: file,./tests/sampleData/images/XMCD.nxs;
+HTTP 200
+[Captures]
+result1: body
+[Asserts]
+body contains "entry"
 
 #---------------- END Test Mapping for Ape-He ----------------------------------
