@@ -13,12 +13,10 @@ import configparser
 
 
 
-#TODO: would this have any benefit from replacing with tifffile lib?
-
 class NexusParser(ImageParser):
 
     internal_mapping = None
-    expected_input = "application/octet-stream"
+    #expected_input = "application/octet-stream"
 
     def __init__(self):
         m = input_to_dict(nexusparser_apeHe.read_text())
@@ -26,11 +24,11 @@ class NexusParser(ImageParser):
 
     @staticmethod
     def expected_input_format():
-        return "application/octet-stream"
+        return ["application/octet-stream", "application/x-hdf5"]
 
     def parse(self, file_path, mapping) -> tuple[ImageMD, str]:
         input_md = self._read_input_file(file_path)
-        #print("<<INPUT>>",input_md, "\n")
+
         if not input_md:
             logging.warning("No metadata extractable from {}".format(file_path))
             return None, None
@@ -62,6 +60,11 @@ class NexusParser(ImageParser):
         md = file_path
 
         output_dict = {}
-        output_dict.update(input_to_dict(md))
+        parsed_dict = input_to_dict(md)
 
+        if parsed_dict is None:
+            logging.error(f"Not able to parse {md}.")
+            return None
+
+        output_dict.update(parsed_dict)
         return output_dict

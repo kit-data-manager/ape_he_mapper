@@ -10,26 +10,25 @@
   "author": [
     {
       "@type": "Person",
-      "givenName": "Germaine",
-      "familyName": "Götzelmann",
-      "@id": "https://orcid.org/0000-0003-3974-3728",
-      "identifier": "https://orcid.org/0000-0003-3974-3728"
-    },
-    {
-      "@type": "Person",
       "givenName": "Gabin Thibaut",
       "familyName": "Oumbe Tekam",
       "@id": "https://orcid.org/0000-0002-6745-3464",
       "identifier": "https://orcid.org/0000-0002-6745-3464"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Germaine",
+      "familyName": "Götzelmann",
+      "@id": "https://orcid.org/0000-0003-3974-3728",
+      "identifier": "https://orcid.org/0000-0003-3974-3728"
     }
   ],
-  "name": "SEM-FIB-Tomo mapper",
-  "description": "SEM-FIB-Tomography Mapper is a tool designed for mapping SEM (Scanning Electron Microscope) images and SEM-FIB Tomography metadata to a uniform, schema-compliant json format.",
-  "version": "0.0.1-SNAPSHOT",
+  "name": "APE-HE mapper",
+  "description": "APE-HE Mapper is a tool designed for mapping APE-HE (Advanced Photoelectric Effect - High Energy) metadata to a uniform, schema-compliant json format.",
+  "version": "v0.0.1-SNAPSHOT",
   "keywords": [
-    "SEM",
-    "Tomography",
-    "TIFF",
+    "APE-HE",
+    "neXus",
     "metadata",
     "extraction",
     "schema"
@@ -37,30 +36,37 @@
   "maintainer": [
     {
       "@type": "Person",
-      "givenName": "Germaine",
-      "familyName": "Götzelmann",
-      "@id": "https://orcid.org/0000-0003-3974-3728",
-      "identifier": "https://orcid.org/0000-0003-3974-3728"
-    },
-    {
-      "@type": "Person",
       "givenName": "Gabin Thibaut",
       "familyName": "Oumbe Tekam",
       "@id": "https://orcid.org/0000-0002-6745-3464",
       "identifier": "https://orcid.org/0000-0002-6745-3464"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Germaine",
+      "familyName": "Götzelmann",
+      "@id": "https://orcid.org/0000-0003-3974-3728",
+      "identifier": "https://orcid.org/0000-0003-3974-3728"
     }
   ],
   "license": [
     "https://spdx.org/licenses/Apache-2.0"
   ],
-  "codeRepository": "https://github.com/kit-data-manager/tomo_mapper",
+  "codeRepository": "https://github.com/kit-data-manager/ape_he_mapper",
   "contributor": [
     {
       "@type": "Person",
-      "givenName": "Pauly",
-      "familyName": "Christoph",
-      "@id": "https://orcid.org/0000-0002-6368-2067",
-      "identifier": "https://orcid.org/0000-0002-6368-2067"
+      "givenName": "Irene",
+      "familyName": "Modolo",
+      "@id": "https://orcid.org/0000-0002-9576-8615",
+      "identifier": "https://orcid.org/0000-0002-9576-8615"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Dario",
+      "familyName": "De Angelis",
+      "@id": "https://orcid.org/0000-0001-9199-6373",
+      "identifier": "https://orcid.org/0000-0001-9199-6373"
     },
     {
       "@type": "Person",
@@ -68,26 +74,6 @@
       "familyName": "Aversa",
       "@id": "https://orcid.org/0000-0003-2534-0063",
       "identifier": "https://orcid.org/0000-0003-2534-0063"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Frank",
-      "familyName": "Mücklich"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Michael",
-      "familyName": "Engstler"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Jonas",
-      "familyName": "Fell"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Sabine",
-      "familyName": "Schlabach"
     }
   ]
 }

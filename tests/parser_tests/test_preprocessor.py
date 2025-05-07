@@ -37,3 +37,29 @@ class TestPreprocessor:
         normalized_units = [x["unit"] for x in input_dict['some']['nested']['units']]
         print(normalized_units)
         assert not [x for x in normalized_units if x not in all_units]
+
+    def test_normalize_gas_name(self): # TODO
+        input_dict = {
+            "somePath": {
+                "nested": {
+                    "gas_name": [
+                        {"name": "/path/to/gas_flux_C2H4"},
+                        {"name": "/path/to/gas_flux_N2"},
+                    ]
+                }
+            }
+        }
+
+
+    def test_normalize_all_numbers(self): #TODO
+        input_dict = {
+            "somePath": {
+                "nested": {
+                    "gas_name": [
+                        {"value": "25.3"},
+                        {"value": "273"},
+                    ]
+                }
+            }
+        }
+

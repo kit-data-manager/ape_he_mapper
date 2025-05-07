@@ -42,7 +42,7 @@ body contains "entry"
 #Execute Mapping with image in unhandled format (change this test once the format is handled)
 POST {{host}}/api/v1/mappingExecution/{{id1}}
 [MultipartFormData]
-document: file,./tests/sampleData/invalidData/001.tif;
+document: file,./tests/sampleData/invalid.nxs;
 HTTP 500
 
 #Execute Mapping with Ape-He sample again after failure above
