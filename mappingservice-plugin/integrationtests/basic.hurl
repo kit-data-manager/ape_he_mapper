@@ -22,7 +22,7 @@ HTTP 201
 # Execute mapping with test data
 POST {{host}}/api/v1/mappingExecution/{{id1}}
 [MultipartFormData]
-document: file,./tests/sampleData/XMCD.nxs
+document: file,./tests/sampleData/XMCD.nxs;
 HTTP 200
 [Captures]
 result1: body
