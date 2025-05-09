@@ -1,52 +1,43 @@
-#Mapping service is reachable before starting with plugin
+# Check if the mapping service is reachable
 GET {{host}}
 HTTP 200
 
+# Get mapping types
 GET {{host}}/api/v1/mappingAdministration/types
 HTTP 200
 [Captures]
 mappingType: jsonpath "$[0].id"
 
-#---------------- BEGIN Test Mapping for Ape-He ----------------------------------
+# ---------------- BEGIN Test Mapping for Ape-He ----------------
 
-# Register a dummy mapping
+# Register a dummy mapping with separate JSON files
 POST {{host}}/api/v1/mappingAdministration/
-Content-Type: multipart/form-data; boundary=boundary
 [Options]
 variable: id1=0
---boundary
-Content-Disposition: form-data; name="record"; filename="record.json"
-Content-Type: application/json
-
-< ./record.json
---boundary
-Content-Disposition: form-data; name="document"; filename="document.json"
-Content-Type: application/json
-
-< ./document.json
---boundary--
-
+[MultipartFormData]
+record: file,record.json; type=application/json
+document: file,document.json; type=application/json
 HTTP 201
 
-# Execute mapping
+# Execute mapping with test data
 POST {{host}}/api/v1/mappingExecution/{{id1}}
 [MultipartFormData]
-document: file,./tests/sampleData/XMCD.nxs;
+document: file,./tests/sampleData/XMCD.nxs
 HTTP 200
 [Captures]
 result1: body
 [Asserts]
 body contains "entry"
 
-# Get plugin ETag
+# Get the ETag of the registered mapping
 GET {{host}}/api/v1/mappingAdministration/{{id1}}
 HTTP 200
 [Captures]
 etag: header "ETag"
 
-# Delete plugin
+# Delete the registered mapping
 DELETE {{host}}/api/v1/mappingAdministration/{{id1}}
 If-Match: {{etag}}
 HTTP 204
 
-#---------------- END Test Mapping for Ape-He ----------------------------------
+# ---------------- END Test Mapping for Ape-He ----------------
