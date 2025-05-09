@@ -100,7 +100,7 @@ jobs:
 
         echo "Using mappingType: $mappingType"
 
-        echo "{\"mappingId\":\"0\",\"mappingType\":\"$mappingType\",\"title\":\"apeHe from CI test\",\"description\":\"\",\"acl\":[]}" > record.json
+        echo "{\"mappingId\":\"96\",\"mappingType\":\"$mappingType\",\"title\":\"apeHe from CI test\",\"description\":\"\",\"acl\":[]}" > record.json
         echo '{"entry.title.value": "entry.title"}' > document.json
 
         unix2dos -n ./mappingservice-plugin/integrationtests/basic.hurl ./mappingservice-plugin/integrationtests/basic_crlf.hurl
