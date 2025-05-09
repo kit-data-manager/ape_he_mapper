@@ -4,7 +4,7 @@ type: software
 title: APE-HE mapper
 abstract: APE-HE Mapper is a tool designed for mapping APE-HE (Advanced Photoelectric
   Effect - High Energy) metadata to a uniform, schema-compliant json format.
-version: v0.0.1-SNAPSHOT
+version: v1.0.0
 keywords:
   - APE-HE
   - neXus
