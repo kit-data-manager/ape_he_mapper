@@ -43,7 +43,7 @@ group 'edu.kit.datamanager'
 //Task for creating a resource file with the version info
 tasks.register("generateVersionProps", WriteProperties) { t ->
     def generatedResourcesDir = project.layout.buildDirectory.dir(["resources", "main"].join(File.separator))
-    def outputFile = generatedResourcesDir.map { it.file("apeHepluginversion.properties") }
+    def outputFile = generatedResourcesDir.map { it.file("apehe_nxs2json.properties") }
 
     t.destinationFile = outputFile.get().asFile
     t.property("version", project.version)
