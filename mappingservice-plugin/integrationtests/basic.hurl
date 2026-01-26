@@ -8,10 +8,10 @@ HTTP 200
 # Get mapping types from the mapping service 
 # to fetch the first available id
 # ----------------------------------------------------------
-GET {{host}}/api/v1/mappingAdministration/types
+GET {{host}}/api/v1/mappingAdministration/plugins
 HTTP 200
 [Captures]
-mappingType: jsonpath "$[0].id"
+mappingType: regex "(?s)\"id\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*[^}]*?\"name\"\\s*:\\s*\"ApeHe_nxs2JSON\""
 
 # ---------------- BEGIN Test Mapping for Ape-He -----------
 
