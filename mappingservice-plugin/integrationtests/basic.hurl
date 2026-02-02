@@ -16,17 +16,26 @@ mappingType: regex "(?s)\"id\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*[^}]*?\"name\"\\s*:\
 # ---------------- BEGIN Test Mapping for Ape-He -----------
 
 # ----------------------------------------------------------
-# Register a dummy mapping with created files:
-# - record.json (containing the mapping scheme metadata)
-# - document.json (containing the dummy map file)
+# Register a dummy mapping with embedded JSON
 # ----------------------------------------------------------
 POST {{host}}/api/v1/mappingAdministration/
+Content-Type: multipart/form-data; boundary=boundary
 [Options]
-variable: id1=96
-[MultipartFormData]
-record: file,record.json; type=application/json
-document: file,document.json; type=application/json
-HTTP 201  # Expect plugin to be successfully created
+variable: id1=0
+```
+--boundary
+Content-Disposition: form-data; name="record"; filename="blob"
+Content-Type: application/json
+
+{"mappingId":"{{id1}}","mappingType": "{{mappingType}}","title":"APE-HE from CI test","description":"","acl":[]}
+--boundary
+Content-Disposition: form-data; name="document"; filename="blob"
+Content-Type: application/json
+
+{"entry.title.value": "entry.title"}
+--boundary--
+```
+HTTP 201
 
 # ----------------------------------------------------------
 # Execute mapping with test data
