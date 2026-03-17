@@ -3,13 +3,13 @@ from typing import Optional
 
 from PIL import Image
 
+from mappingservice_plugincore.exceptions.MappingAbortionError import MappingAbortionError
 from src.Preprocessor import Preprocessor
 from src.model.ImageMD import ImageMD
-from src.parser.ImageParser import ImageParser
+from mappingservice_plugincore.parser.ImageParser import ImageParser
 from src.parser.mapping_util import map_a_dict
 from src.resources.maps.mapping import nexusparser_apeHe
 from src.util import input_to_dict
-import configparser
 
 
 
@@ -68,3 +68,15 @@ class NexusParser(ImageParser):
 
         output_dict.update(parsed_dict)
         return output_dict
+
+    def _create_tomo_image(self, image_md, fp):
+        """
+        Implementation of abstract method from ImageParser
+        For APE-HE data, we create a simple image format
+        """
+        image_md_format = {
+            "image_metadata": image_md,
+            "filePath": fp
+        }
+        
+        return ImageMD(image_metadata=image_md, filePath=fp)

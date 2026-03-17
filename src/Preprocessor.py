@@ -37,6 +37,37 @@ class Preprocessor:
         return expected_types.get(field_path, None)
 
     @staticmethod
+    def is_numeric_string(value):
+        """Check if a string represents a valid number"""
+        if not isinstance(value, str):
+            return False
+        
+        # Try to convert to float first
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
+
+    @staticmethod
+    def convert_numeric_string(value):
+        """Convert numeric string to int if possible, else float"""
+        if not Preprocessor.is_numeric_string(value):
+            return value
+        
+        try:
+            # Try int first (for whole numbers)
+            if '.' not in value and 'e' not in value.lower():
+                return int(value)
+            else:
+                return float(value)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError:
+                return value
+
+    @staticmethod
     def normalize_unit(input_value) -> str:
         if input_value in Preprocessor.unit_normalization.keys():
             return Preprocessor.unit_normalization[input_value]
@@ -88,7 +119,8 @@ class Preprocessor:
     @staticmethod
     def normalize_all_numbers(input_dict):
         """
-        In-place conversion of numeric strings into integers or floats, but checks if it's an appropriate field.
+        In-place conversion of numeric strings into integers or floats.
+        Converts all numeric strings automatically, with special handling for specific field types.
         :param input_dict: dictionary to convert numeric values in
         :return: None
         """
@@ -98,9 +130,8 @@ class Preprocessor:
             original_value = match.value
             current_field = str(match.full_path)
             expected_type = Preprocessor.get_expected_type(current_field)
-            #print("<<<<>>>>  ",original_value)
                 
-            # Handle type conversions if needed (e.g.: int_type, float_type)
+            # Handle type conversions for explicitly defined fields
             if isinstance(original_value, str):
                 try:
                     if expected_type == "int_type": # Convert only if it's a valid integer-like string
@@ -109,6 +140,10 @@ class Preprocessor:
                     elif expected_type == "float_type": # Convert only if it's a valid float-like string
                         converted_value = float(original_value)
                         match.full_path.update(input_dict, converted_value)
+                    elif expected_type != "string_type": # Auto-convert for other fields
+                        converted_value = Preprocessor.convert_numeric_string(original_value)
+                        if converted_value != original_value:
+                            match.full_path.update(input_dict, converted_value)
                 except ValueError:
                     logging.warning(f"Error while trying to convert '{original_value}' into {expected_type} for field {current_field}")
                     continue

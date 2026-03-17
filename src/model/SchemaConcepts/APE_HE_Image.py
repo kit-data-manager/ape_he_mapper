@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from src.model.SchemaConcepts.Schema_Concept import Schema_Concept
+from mappingservice_plugincore.model.Schema_Concept import Schema_Concept
 from src.model.SchemaConcepts.codegen.SchemaClasses_APE_HE import Entry, ApeHe
 
 

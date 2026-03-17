@@ -2,8 +2,8 @@ import logging
 import mimetypes
 import os
 
-from src.IO.MappingAbortionError import MappingAbortionError
-from src.parser.ParserFactory import ParserFactory
+from mappingservice_plugincore.exceptions.MappingAbortionError import MappingAbortionError
+from mappingservice_plugincore.parser.ParserFactory import ParserFactory
 from src.util import load_json, get_filetype_with_magica, robust_textfile_read
 
 

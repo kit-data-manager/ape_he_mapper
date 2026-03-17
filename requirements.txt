@@ -13,4 +13,4 @@ zipfile2
 pytest >= 7.4
 pytest-cov >= 6.0
 pytest-mock >= 3.14.0
-
+mappingservice-plugincore @ git+https://github.com/GGoetzelmann/mappingservice_plugincore.git@development
