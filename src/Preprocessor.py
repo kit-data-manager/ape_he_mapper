@@ -30,11 +30,21 @@ class Preprocessor:
 
         expected_types = {
             "entry.entry_identifier": "string_type",
-            "entry.instrument.monochromator.grating.period.value": "int_type",
+            "entry.title": "string_type",
             "entry.sample.gas_flux[*].value": "float_type"
         }
 
-        return expected_types.get(field_path, None)
+        # Check exact match first
+        exact_match = expected_types.get(field_path)
+        if exact_match:
+            return exact_match
+
+        # Check if any expected pattern exists within the field_path
+        for pattern, expected_type in expected_types.items():
+            if pattern in field_path:
+                return expected_type
+ 
+        return None
 
     @staticmethod
     def is_numeric_string(value):
@@ -134,13 +144,15 @@ class Preprocessor:
             # Handle type conversions for explicitly defined fields
             if isinstance(original_value, str):
                 try:
-                    if expected_type == "int_type": # Convert only if it's a valid integer-like string
+                    if expected_type == "string_type":
+                        continue # Keep as string, do not convert
+                    elif expected_type == "int_type": # Convert only if it is a valid integer-like string
                         converted_value = int(original_value)
                         match.full_path.update(input_dict, converted_value)
                     elif expected_type == "float_type": # Convert only if it's a valid float-like string
                         converted_value = float(original_value)
                         match.full_path.update(input_dict, converted_value)
-                    elif expected_type != "string_type": # Auto-convert for other fields
+                    else: # Auto-convert for other fields
                         converted_value = Preprocessor.convert_numeric_string(original_value)
                         if converted_value != original_value:
                             match.full_path.update(input_dict, converted_value)
