@@ -1,6 +1,6 @@
 [project]
 name = "APE-HE mapper"
-version = "v1.0.0"
+version = "separate_lib"
 description = "APE-HE Mapper is a tool designed for mapping APE-HE (Advanced Photoelectric Effect - High Energy) metadata to a uniform, schema-compliant json format."
 
 keywords = ["APE-HE", "neXus", "metadata", "extraction", "schema"]
