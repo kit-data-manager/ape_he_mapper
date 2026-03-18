@@ -40,14 +40,13 @@ class NexusParser(ImageParser):
         image_md = map_a_dict(input_md, mapping_dict)
 
         # Debug: Check values before preprocessing
-        print("=== BEFORE PREPROCESSING ===", image_md)
+        
         #Preprocessor.normalize_all_datetimes(image_md)
         Preprocessor.normalize_all_numbers(image_md)
         Preprocessor.normalize_all_units(image_md)
         Preprocessor.normalize_gas_names(image_md)
 
         # Debug: Check values after preprocessing
-        print("=== AFTER PREPROCESSING ===", image_md)
 
         image_from_md = ImageMD(image_metadata=image_md, filePath="")
 
