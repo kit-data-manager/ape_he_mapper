@@ -7,9 +7,10 @@ import zipfile
 import shutil
 from pathlib import Path
 
-from src.IO.MappingAbortionError import MappingAbortionError
+from mappingservice_plugincore.exceptions.MappingAbortionError import MappingAbortionError
 from src.IO.InputReader import InputReader as InputReader_apeHe
 from src.IO.OutputWriter import OutputWriter
+from src.parser import ParserConfig
 
 # Make log level configurable from ENV, defaults to INFO level
 logging.basicConfig(
@@ -28,6 +29,7 @@ def run_cli():
     run_mapper(args)
 
 def run_mapper(args):
+    ParserConfig.register_parsers()
     INPUT_SOURCE = args.input
     MAP_SOURCE = args.map
     OUTPUT_PATH = args.output

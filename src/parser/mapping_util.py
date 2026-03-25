@@ -3,8 +3,7 @@ import re
 import typing
 import numpy as np
 from jsonpath_ng.ext.parser import ExtentedJsonPathParser
-from src.IO.MappingAbortionError import MappingAbortionError
-import re
+from mappingservice_plugincore.exceptions.MappingAbortionError import MappingAbortionError
 
 parser = ExtentedJsonPathParser()
 
