@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import jsonpath_ng.ext
 from src.parser.mapping_util import escape_pathelements, apply_arithmetic, get_matching_keys, create_unified_dict
-from src.IO.MappingAbortionError import MappingAbortionError
+from mappingservice_plugincore.exceptions.MappingAbortionError import MappingAbortionError
 
 
 class TestMappingUtil:

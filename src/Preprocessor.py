@@ -4,7 +4,7 @@ from datetime import datetime
 
 from jsonpath_ng.parser import JsonPathParser
 
-from src.model.SchemaConcepts.Schema_Concept import parse_datetime
+from mappingservice_plugincore.model.Schema_Concept import parse_datetime
 
 
 class Preprocessor:

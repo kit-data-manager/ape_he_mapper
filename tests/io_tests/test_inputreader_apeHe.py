@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from src.IO.MappingAbortionError import MappingAbortionError
+from mappingservice_plugincore.exceptions.MappingAbortionError import MappingAbortionError
 from src.IO.InputReader import InputReader
 from src.parser import ParserConfig
 from src.parser.impl.NexusParser import NexusParser
