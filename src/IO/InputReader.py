@@ -4,21 +4,19 @@ import os
 
 from mappingservice_plugincore.exceptions.MappingAbortionError import MappingAbortionError
 from mappingservice_plugincore.parser.ParserFactory import ParserFactory
+from mappingservice_plugincore.IO.BaseInputReader import BaseInputReader
 from src.util import load_json, get_filetype_with_magica, robust_textfile_read
 
 
-class InputReader:
+class InputReader(BaseInputReader):
 
     mapping = None
     parser_names = None
 
     def __init__(self, map_path, input_path):
+        super().__init__(map_path, input_path)
         logging.info("Preparing parsers based on parsing map file and input.")
         self.mapping = load_json(map_path)
-
-        if not os.path.exists(input_path):
-            logging.error("Input file {} does not exist. Aborting".format(input_path))
-            raise MappingAbortionError("Input file loading failed.")
 
         self.parser_names = self.get_applicable_parsers(input_path)
 
@@ -32,7 +30,6 @@ class InputReader:
             logging.info("Supported mimetypes: {}".format(mimetype_set))
             raise MappingAbortionError("Input file parsing aborted.")
         logging.info("Applicable parsers: {}".format(", ".join(self.parser_names)))
-
 
     @staticmethod
     def get_applicable_parsers(input_path):
@@ -68,9 +65,11 @@ class InputReader:
         Applies the applicable list of parsers to the provided input. Stops on the first successful parsing result and returns it.
         Usually we do not expect more than one applicable parser to be available. If so, it would be advised to add more checks to keep the list of parsers at len 1.
         :param input_path: path to input file
-        :return:
+        :return: first successful parsing result
         """
-        for parser in self.parser_names:
+        input_path = self.input_path
+        parser_names = self.get_applicable_parsers(input_path)
+        for parser in parser_names:
             logging.debug("Trying to parse image with {}".format(parser))
             imgp = ParserFactory.create_img_parser(parser)
 
