@@ -3,11 +3,11 @@ import numpy as np
 from datetime import datetime
 
 from jsonpath_ng.parser import JsonPathParser
-
+from mappingservice_plugincore.Preprocessor import Preprocessor as CorePreprocessor
 from mappingservice_plugincore.model.Schema_Concept import parse_datetime
 
 
-class Preprocessor:
+class Preprocessor(CorePreprocessor):
     """
     Use / adapt / extend for final preprocessing steps before converting a dictionary into the according pydantic class instances
     """

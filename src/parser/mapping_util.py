@@ -4,6 +4,7 @@ import typing
 import numpy as np
 from jsonpath_ng.ext.parser import ExtentedJsonPathParser
 from mappingservice_plugincore.exceptions.MappingAbortionError import MappingAbortionError
+from mappingservice_plugincore.parser import mapping_util
 
 parser = ExtentedJsonPathParser()
 
