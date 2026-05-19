@@ -6,7 +6,7 @@ import sys
 import zipfile
 import shutil
 from pathlib import Path
-
+from mappingservice_plugincore.file_util import is_zipfile
 from mappingservice_plugincore.exceptions.MappingAbortionError import MappingAbortionError
 from src.IO.InputReader import InputReader as InputReader_apeHe
 from src.IO.OutputWriter import OutputWriter
@@ -35,7 +35,7 @@ def run_mapper(args):
     OUTPUT_PATH = args.output
 
     try:
-        if zipfile.is_zipfile(INPUT_SOURCE):
+        if is_zipfile(INPUT_SOURCE):
             temp_dir = os.path.splitext(INPUT_SOURCE)[0]
             logging.info(f"Extracting ZIP to temporary folder: {temp_dir}")
             extracted_files = []
