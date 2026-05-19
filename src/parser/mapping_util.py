@@ -5,7 +5,7 @@ This module keeps APE-HE-specific mapping behavior that is not yet available in
 mappingservice_plugincore:
 - wildcard expansion for NeXus source keys, e.g. gas_flux_*
 - arithmetic aggregation over array datasets
-- NumPy scalar normalization before schema construction
+- NumPy scalar normalization before schema construction e.g. np.array([709.992]) -> 709.992
 """
 
 import logging
@@ -14,32 +14,18 @@ import typing
 import numpy as np
 from jsonpath_ng.ext.parser import ExtentedJsonPathParser
 from mappingservice_plugincore.exceptions.MappingAbortionError import MappingAbortionError
-from mappingservice_plugincore.parser import mapping_util
+from mappingservice_plugincore.parser.mapping_util import escape_pathelements as core_escape_pathelements
 
 parser = ExtentedJsonPathParser()
 
 def escape_pathelements(dotted_path):
-    funct_match = re.search(r"`(.+?)`", dotted_path)
-    if funct_match:
-        function_name = funct_match.group(1)
-        if function_name == "arithmetic":
-            return dotted_path.replace(f"`{function_name}`", "FUNCTIONPLACEHOLDER")
+    arithmetic_match = re.match(r"^(.*)\.(`arithmetic`\[-?\d+\])$", dotted_path)
 
-    path_elements = dotted_path.split(".")
-    escaped_elements = []
-    for pe in path_elements:
-        if not pe: 
-            continue
-        if "[" in pe:
-            to_escape, to_keep = pe.split("[", 1)
-            escaped = f"'{to_escape}'"
-            pe = escaped + "[" + to_keep
-        else:
-            pe = f"'{pe}'"
-        if pe == "'FUNCTIONPLACEHOLDER'":
-            pe = "`arithmetic`"
-        escaped_elements.append(pe)
-    return ".".join(escaped_elements)
+    if arithmetic_match:
+        base_path, arithmetic_selector = arithmetic_match.groups()
+        return "{}.{}".format(core_escape_pathelements(base_path), arithmetic_selector)
+
+    return core_escape_pathelements(dotted_path)
 
 def flatten_dict(d, parent_key="", sep="."):
     flattened = {}
@@ -52,7 +38,8 @@ def flatten_dict(d, parent_key="", sep="."):
     return flattened
 
 def extract_base_path(path: str):
-    match = re.match(r"^(.*)\.(\w+\[\-?\d+\])$", path)
+    #match = re.match(r"^(.*)\.(\w+\[\-?\d+\])$", path)
+    match = re.match(r"^(.*)\.(`arithmetic`\[-?\d+\])$", path)
     if match:
         base_path, sort_function = match.groups()
         return base_path, sort_function
@@ -80,6 +67,11 @@ def get_matching_keys(original_path_template,input_dict):
         matching_keys = [original_path_template]
     return matching_keys
 
+def normalize_numpy_value(value):
+    if isinstance(value, np.ndarray) and len(value) == 1:
+        return value.item()
+    return value
+
 def create_unified_dict(mapping, input_dict):
     output_dict = {}
 
@@ -89,7 +81,7 @@ def create_unified_dict(mapping, input_dict):
 
         # Handle ARITHMETIC paths
         if k2:
-            index = 0 if '[0]' in k2 else -1 if '[-1]' in k2 else 1 if '[1]' in k2 else None
+            index = 0 if "[0]" in k2 else -1 if "[-1]" in k2 else 1 if "[1]" in k2 else None
             exprIN = parser.parse(k1)
             exprOUT = parser.parse(v)
             values = [m.value for m in exprIN.find(input_dict)]
@@ -108,11 +100,13 @@ def create_unified_dict(mapping, input_dict):
                         continue
 
                     exprOUT.update_or_create(output_dict, result)
-                else:
+                elif values:
                     logging.warning("Found a value equivalent to None. path: {}, value: {}".format(k, values[0]))
+                else:
+                    logging.warning("Mapping defined but no corresponding value found in input dict: {}".format(k))
             except Exception as e:
                 logging.error("Unexpected error: {} at path: {}, values: {}".format(e, k, values))
-            continue  # Skip rest since this path is handled
+            continue
 
         # Handle (*) mapping
         if "*" in v:
@@ -121,7 +115,7 @@ def create_unified_dict(mapping, input_dict):
             values = []
             for exprIN in exprIN_list:
                 val = [
-                    m.value.item() if isinstance(m.value, np.ndarray) and len(m.value) == 1 else m.value
+                    normalize_numpy_value(m.value)
                     for m in exprIN.find(input_dict)
                 ]
                 values.extend(val)
@@ -129,12 +123,12 @@ def create_unified_dict(mapping, input_dict):
             exprIN = parser.parse(escaped_k)
             exprOUT = parser.parse(v)
             values = [
-                m.value.item() if isinstance(m.value, np.ndarray) and len(m.value) == 1 else m.value
+                normalize_numpy_value(m.value)
                 for m in exprIN.find(input_dict)
             ]
 
         if not values:
-            logging.warning(f"Mapping defined but no corresponding value found in input dict: {k}")
+            logging.warning("Mapping defined but no corresponding value found in input dict: {}".format(k))
             continue
 
         # Handle regular output
@@ -145,7 +139,7 @@ def create_unified_dict(mapping, input_dict):
                 else:
                     assert len(set(values)) == 1
             except AssertionError:
-                logging.error(f"Found multiple values in input dict, but output target is not a list. Aborting. Input path: {k}, values: {values}")
+                logging.error("Found multiple values in input dict, but output target is not a list. Aborting. Input path: {}, values: {}".format(k, values))
                 raise MappingAbortionError("Mapping input to output format failed. Mapping not applicable.")
 
             try:
@@ -158,7 +152,7 @@ def create_unified_dict(mapping, input_dict):
         else:
             for i, value in enumerate(values):
                 if value:
-                    indexed_expr = parser.parse(v.replace('*', str(i)))
+                    indexed_expr = parser.parse(v.replace("*", str(i)))
                     indexed_expr.update_or_create(output_dict, value)
                 else:
                     logging.warning("Found a value equivalent to None. path: {}, value: {}".format(k, value))
