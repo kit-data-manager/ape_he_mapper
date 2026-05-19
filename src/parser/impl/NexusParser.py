@@ -72,15 +72,3 @@ class NexusParser(ImageParser):
 
         output_dict.update(parsed_dict)
         return output_dict
-
-    def _create_tomo_image(self, image_md, fp):
-        """
-        Implementation of abstract method from ImageParser
-        For APE-HE data, we create a simple image format
-        """
-        image_md_format = {
-            "image_metadata": image_md,
-            "filePath": fp
-        }
-        
-        return ImageMD(image_metadata=image_md, filePath=fp)
