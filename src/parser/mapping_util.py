@@ -1,3 +1,13 @@
+"""
+APE-HE mapping helpers.
+
+This module keeps APE-HE-specific mapping behavior that is not yet available in
+mappingservice_plugincore:
+- wildcard expansion for NeXus source keys, e.g. gas_flux_*
+- arithmetic aggregation over array datasets
+- NumPy scalar normalization before schema construction
+"""
+
 import logging
 import re
 import typing
