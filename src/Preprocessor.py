@@ -1,188 +1,153 @@
 import logging
-import numpy as np
-from datetime import datetime
+from typing import Any
 
+import numpy as np
 from jsonpath_ng.parser import JsonPathParser
 from mappingservice_plugincore.Preprocessor import Preprocessor as CorePreprocessor
-from mappingservice_plugincore.model.Schema_Concept import parse_datetime
 
 
 class Preprocessor(CorePreprocessor):
     """
-    Use / adapt / extend for final preprocessing steps before converting a dictionary into the according pydantic class instances
+    APE-HE-specific preprocessing before schema construction.
+
+    The core preprocessor already handles generic datetime normalization.
+    This subclass keeps only APE-HE / NeXus-specific behavior:
+    - schema-specific unit normalization
+    - numeric string conversion
+    - NumPy array value conversion
+    - gas name extraction from NeXus-style paths
     """
 
     parser = JsonPathParser()
 
     unit_normalization = {
-        'deg': 'degrees',
-        'degr': 'degrees',
-        '°': 'degrees',
-        '\udcb0': 'degrees',
-        '\udcb0C': '°C',
-        'μm': 'um',
-        'Secs': 's',
-        'Mins': 'min'
+        "deg": "degrees",
+        "degr": "degrees",
+        "°": "degrees",
+        "\udcb0": "degrees",
+        "\udcb0C": "°C",
+        "Secs": "s",
+        "Mins": "min",
     }
 
-    @staticmethod
-    def get_expected_type(field_path):
+    expected_types = {
+        "entry.entry_identifier": "string_type",
+        "entry.title": "string_type",
+        "entry.sample.gas_flux[*].value": "float_type",
+    }
 
-        expected_types = {
-            "entry.entry_identifier": "string_type",
-            "entry.title": "string_type",
-            "entry.sample.gas_flux[*].value": "float_type"
-        }
-
-        # Check exact match first
-        exact_match = expected_types.get(field_path)
+    @classmethod
+    def get_expected_type(cls, field_path: str):
+        exact_match = cls.expected_types.get(field_path)
         if exact_match:
             return exact_match
 
-        # Check if any expected pattern exists within the field_path
-        for pattern, expected_type in expected_types.items():
+        for pattern, expected_type in cls.expected_types.items():
             if pattern in field_path:
                 return expected_type
- 
+
         return None
 
     @staticmethod
-    def is_numeric_string(value):
-        """Check if a string represents a valid number"""
+    def is_numeric_string(value: Any) -> bool:
         if not isinstance(value, str):
             return False
-        
-        # Try to convert to float first
+
         try:
             float(value)
             return True
         except ValueError:
             return False
 
-    @staticmethod
-    def convert_numeric_string(value):
-        """Convert numeric string to int if possible, else float"""
-        if not Preprocessor.is_numeric_string(value):
+    @classmethod
+    def convert_numeric_string(cls, value: Any):
+        if not cls.is_numeric_string(value):
             return value
-        
+
         try:
-            # Try int first (for whole numbers)
-            if '.' not in value and 'e' not in value.lower():
+            if "." not in value and "e" not in value.lower():
                 return int(value)
-            else:
-                return float(value)
+            return float(value)
         except ValueError:
-            try:
-                return float(value)
-            except ValueError:
+            return value
+
+    @classmethod
+    def normalize_unit(cls, input_value) -> str:
+        return cls.unit_normalization.get(input_value, input_value)
+
+    @classmethod
+    def normalize_all_units(cls, input_dict):
+        unit_fields = cls.parser.parse("$..unit")
+
+        for match in unit_fields.find(input_dict):
+            if not isinstance(match.value, str):
+                continue
+
+            normalized_value = cls.normalize_unit(match.value)
+            if normalized_value != match.value:
+                match.full_path.update(input_dict, normalized_value)
+
+    @classmethod
+    def normalize_number_value(cls, value, expected_type=None):
+        if isinstance(value, str):
+            if expected_type == "string_type":
                 return value
+            if expected_type == "int_type":
+                return int(value)
+            if expected_type == "float_type":
+                return float(value)
+            return cls.convert_numeric_string(value)
 
-    @staticmethod
-    def normalize_unit(input_value) -> str:
-        if input_value in Preprocessor.unit_normalization.keys():
-            return Preprocessor.unit_normalization[input_value]
-        return input_value
+        return value
 
-    @staticmethod
-    def normalize_all_units(input_dict):
-        """
-        Inplace normalization of all values in fields "unit"
-        :param input_dict: dictionary to replace units in
-        :return: None
-        """
-        unit_fields = Preprocessor.parser.parse("$..unit")
-        unit_matches = [m for m in unit_fields.find(input_dict)]
-        for m in unit_matches:
-            if type(m.value) != str: continue #TODO: should this be possible?
-            original_value = m.value
-            if not Preprocessor.unit_normalization.get(original_value): continue
+    @classmethod
+    def normalize_numpy_array(cls, value):
+        if not isinstance(value, np.ndarray) or value.size == 0:
+            return value
 
-            normalized_value = Preprocessor.unit_normalization[original_value]
-            if normalized_value != original_value:
-                m.full_path.update(input_dict, normalized_value)
+        try:
+            return value.astype(float)
+        except (TypeError, ValueError):
+            logging.warning("Could not convert NumPy array values to float: %s", value)
+            return value
 
-    @staticmethod
-    def normalize_datetime(input_value) -> str:
-        if type(input_value) == dict:
-            if not input_value.get("Date") and input_value.get("Time"):
-                logging.warning("Encountered complex date field, but cannot interpret it")
-                return input_value
-            input_value = input_value.get("Date") + " " + input_value.get("Time")
-        output_value = parse_datetime(input_value)
-        if type(output_value) == datetime:
-            return output_value.isoformat()
-        return input_value
-
-    @staticmethod
-    def normalize_all_datetimes(input_dict):
-        fields_for_normalization = ["creationTime", "startTime", "endTime"] #we could do it more generically but may want to limit it to specific fields
-
-        for f in fields_for_normalization:
-            date_fields = Preprocessor.parser.parse("$.." + f)
-            date_matches = [m for m in date_fields.find(input_dict)]
-            for m in date_matches:
-                original_value = m.value
-                normalized_value = Preprocessor.normalize_datetime(original_value)
-                if normalized_value != original_value:
-                    m.full_path.update(input_dict, normalized_value)
-
-    @staticmethod
-    def normalize_all_numbers(input_dict):
-        """
-        In-place conversion of numeric strings into integers or floats.
-        Converts all numeric strings automatically, with special handling for specific field types.
-        :param input_dict: dictionary to convert numeric values in
-        :return: None
-        """
-        number_fields = Preprocessor.parser.parse("$..*")  # Traverse all fields
+    @classmethod
+    def normalize_all_numbers(cls, input_dict):
+        number_fields = cls.parser.parse("$..*")
 
         for match in number_fields.find(input_dict):
             original_value = match.value
             current_field = str(match.full_path)
-            expected_type = Preprocessor.get_expected_type(current_field)
-                
-            # Handle type conversions for explicitly defined fields
-            if isinstance(original_value, str):
-                try:
-                    if expected_type == "string_type":
-                        continue # Keep as string, do not convert
-                    elif expected_type == "int_type": # Convert only if it is a valid integer-like string
-                        converted_value = int(original_value)
-                        match.full_path.update(input_dict, converted_value)
-                    elif expected_type == "float_type": # Convert only if it's a valid float-like string
-                        converted_value = float(original_value)
-                        match.full_path.update(input_dict, converted_value)
-                    else: # Auto-convert for other fields
-                        converted_value = Preprocessor.convert_numeric_string(original_value)
-                        if converted_value != original_value:
-                            match.full_path.update(input_dict, converted_value)
-                except ValueError:
-                    logging.warning(f"Error while trying to convert '{original_value}' into {expected_type} for field {current_field}")
-                    continue
-            
-            # Check if the value is a numpy array
-            if isinstance(original_value, np.ndarray) and original_value.size > 0:
-                try:
-                    converted_value = np.array([int(x) if isinstance(x, (int, str)) and not np.isnan(x) 
-                                                else float(x) if isinstance(x, (float, str)) and not np.isnan(x) 
-                                                else x 
-                                                for x in original_value], dtype=float)
+            expected_type = cls.get_expected_type(current_field)
 
-                    match.full_path.update(input_dict, converted_value)
-                except ValueError:
-                    logging.warning(f"Error while converting numpy array values for field {current_field}")
-                    continue
+            try:
+                if isinstance(original_value, str):
+                    converted_value = cls.normalize_number_value(original_value, expected_type)
+                    if converted_value != original_value:
+                        match.full_path.update(input_dict, converted_value)
 
-    @staticmethod
-    def normalize_gas_names(input_dict):
-        gas_fields = Preprocessor.parser.parse("$..gas_name")
+                elif isinstance(original_value, np.ndarray):
+                    converted_value = cls.normalize_numpy_array(original_value)
+                    if converted_value is not original_value:
+                        match.full_path.update(input_dict, converted_value)
+
+            except ValueError:
+                logging.warning(
+                    "Error while trying to convert '%s' into %s for field %s",
+                    original_value,
+                    expected_type,
+                    current_field,
+                )
+
+    @classmethod
+    def normalize_gas_names(cls, input_dict):
+        gas_fields = cls.parser.parse("$..gas_name")
 
         for match in gas_fields.find(input_dict):
             original_value = match.value
-            # Extract gas name if it's stored incorrectly (e.g., "/entry/sample/gas_flux_C2H4")
+
             if isinstance(original_value, str) and "/" in original_value:
                 possible_gas = original_value.split("_")[-1]
                 match.full_path.update(input_dict, possible_gas)
             else:
-                logging.warning(f"Unexpected gas name format: {original_value}")
-
+                logging.warning("Unexpected gas name format: %s", original_value)
