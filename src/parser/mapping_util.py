@@ -19,11 +19,11 @@ from mappingservice_plugincore.parser.mapping_util import escape_pathelements as
 parser = ExtentedJsonPathParser()
 
 def escape_pathelements(dotted_path):
-    arithmetic_match = re.match(r"^(.*)\.(`arithmetic`\[-?\d+\])$", dotted_path)
+    arithmetic_match = re.match(r"^(.*)\.`arithmetic`(\[-?\d+\])$", dotted_path)
 
     if arithmetic_match:
-        base_path, arithmetic_selector = arithmetic_match.groups()
-        return "{}.{}".format(core_escape_pathelements(base_path), arithmetic_selector)
+        base_path, arithmetic_index = arithmetic_match.groups()
+        return core_escape_pathelements("{}.arithmetic{}".format(base_path, arithmetic_index))
 
     return core_escape_pathelements(dotted_path)
 
@@ -39,7 +39,7 @@ def flatten_dict(d, parent_key="", sep="."):
 
 def extract_base_path(path: str):
     #match = re.match(r"^(.*)\.(\w+\[\-?\d+\])$", path)
-    match = re.match(r"^(.*)\.(`arithmetic`\[-?\d+\])$", path)
+    match = re.match(r"^(.*)\.('arithmetic'\[-?\d+\])$", path)
     if match:
         base_path, sort_function = match.groups()
         return base_path, sort_function
