@@ -28,7 +28,7 @@ class Preprocessor:
 
     @staticmethod
     def get_expected_type(field_path):
-        # "((((entry.sample).gas_flux).[0]).value)" -> "entry.sample.gas_flux[*].value"
+        # '((((entry.sample).gas_flux).[0]).value)' -> 'entry.sample.gas_flux[*].value'
         cleaned = field_path.replace("(", "").replace(")", "")
         cleaned = re.sub(r"\.?\[\d+\]", "[*]", cleaned)
 
