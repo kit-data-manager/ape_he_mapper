@@ -63,3 +63,24 @@ class TestPreprocessor:
             }
         }
 
+    def test_get_expected_type(self):
+        # Simple field path
+        assert Preprocessor.get_expected_type(
+            "entry.entry_identifier"
+        ) == "string_type"
+
+        # Path containing parentheses
+        assert Preprocessor.get_expected_type(
+            "(((((entry.instrument).monochromator).grating).period).value)"
+        ) == "int_type"
+
+        # Path containing parentheses and a list index
+        assert Preprocessor.get_expected_type(
+            "((((entry.sample).gas_flux).[0]).value)"
+        ) == "float_type"
+
+        # Unknown field
+        assert Preprocessor.get_expected_type(
+            "entry.unknown.field"
+        ) is None
+
