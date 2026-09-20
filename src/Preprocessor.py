@@ -5,6 +5,7 @@ from datetime import datetime
 from jsonpath_ng.parser import JsonPathParser
 
 from src.model.SchemaConcepts.Schema_Concept import parse_datetime
+import re
 
 
 class Preprocessor:
@@ -27,14 +28,16 @@ class Preprocessor:
 
     @staticmethod
     def get_expected_type(field_path):
+        # "((((entry.sample).gas_flux).[0]).value)" -> "entry.sample.gas_flux[*].value"
+        cleaned = field_path.replace("(", "").replace(")", "")
+        cleaned = re.sub(r"\.?\[\d+\]", "[*]", cleaned)
 
         expected_types = {
-            "entry.entry_identifier": "string_type",
-            "entry.instrument.monochromator.grating.period.value": "int_type",
-            "entry.sample.gas_flux[*].value": "float_type"
+           "entry.entry_identifier": "string_type",
+           "entry.instrument.monochromator.grating.period.value": "int_type",
+           "entry.sample.gas_flux[*].value": "float_type",
         }
-
-        return expected_types.get(field_path, None)
+        return expected_types.get(cleaned)
 
     @staticmethod
     def normalize_unit(input_value) -> str:
