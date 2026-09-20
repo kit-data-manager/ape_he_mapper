@@ -16,10 +16,10 @@ class Preprocessor:
     parser = JsonPathParser()
 
     unit_normalization = {
-        'deg': 'degrees',
-        'degr': 'degrees',
-        '°': 'degrees',
-        '\udcb0': 'degrees',
+        'deg': 'degree',
+        'degr': 'degree',
+        '°': 'degree',
+        '\udcb0': 'degree',
         '\udcb0C': '°C',
         'μm': 'um',
         'Secs': 's',
