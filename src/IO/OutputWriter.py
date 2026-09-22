@@ -4,7 +4,7 @@ import logging
 import zipfile
 import shutil
 
-from src.IO.MappingAbortionError import MappingAbortionError
+from mappingservice_plugincore.exceptions.MappingAbortionError import MappingAbortionError
 
 
 

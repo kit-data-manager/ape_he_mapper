@@ -4,9 +4,10 @@ import os
 from pydantic import BaseModel
 
 from src.model.SchemaConcepts.APE_HE_Image import APE_HE_Image
+from mappingservice_plugincore.model.ImageMD import ImageMD as GenericImageMD
 
 
-class ImageMD(BaseModel):
+class ImageMD(GenericImageMD[APE_HE_Image]):
 
     filePath: str
     image_metadata: APE_HE_Image = None
