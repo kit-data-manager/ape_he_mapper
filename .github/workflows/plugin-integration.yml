@@ -7,12 +7,10 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.operating-system }}
-    environment:
-      name: ${{ github.ref_name }}
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
-        versions: [ { jdk: 17, mapping-service: v1.0.5 }, { jdk: 21, mapping-service: v1.1.1 } ]
+        versions: [ { jdk: 17, mapping-service: v2.0.2 }, { jdk: 21, mapping-service: latest } ]
 
     steps:
     - name: Checkout repository
@@ -34,8 +32,9 @@ jobs:
         JAR_VERSION=$(./mappingservice-plugin/gradlew printVersion -q -p ./mappingservice-plugin/)
         JAR_VERSION=${JAR_VERSION##*$'\n'}
         ./mappingservice-plugin/gradlew clean jar -p ./mappingservice-plugin/
+        ls -ll ./mappingservice-plugin/build/libs/
         echo "JAR_VERSION=${JAR_VERSION}"
-        mv -v ./mappingservice-plugin/build/libs/ApeHePlugin-$JAR_VERSION-plain.jar ./mappingservice-plugin/build/libs/ApeHeplugin.jar
+        mv -v ./mappingservice-plugin/build/libs/ApeHePlugin-$JAR_VERSION.jar ./mappingservice-plugin/build/libs/ApeHeplugin.jar
       env:
         VERSION_OVERRIDE_BY_BRANCH: ${{ steps.extract_branch.outputs.branch }}
 
@@ -47,13 +46,11 @@ jobs:
 
   test:
     runs-on: ${{ matrix.operating-system }}
-    environment:
-      name: ${{ github.ref_name }}
     strategy:
       fail-fast: false
       matrix:
         operating-system: [ubuntu-latest]
-        versions: [ { jdk: 17, mapping-service: v1.0.5 }, { jdk: 21, mapping-service: v1.1.1 } ]
+        versions: [ { jdk: 17, mapping-service: v2.0.2 }, { jdk: 21, mapping-service: latest } ]
     needs: build
 
     steps:
@@ -73,7 +70,7 @@ jobs:
 
     - name: Run Docker Container
       run: |
-        docker run -d -p 8095:8095 -e PIP_BREAK_SYSTEM_PACKAGES=1 -v ./plugins/ApeHeplugin.jar:/spring/mapping-service/plugins/ApeHeplugin.jar --name mapping4docker ghcr.io/kit-data-manager/mapping-service:${{ matrix.versions.mapping-service }}
+        docker run -d -p 8095:8095 -e PIP_BREAK_SYSTEM_PACKAGES=1 -e SPRING_APPLICATION_JSON='{"mapping-service.executionTimeout":300}' -v ./plugins/ApeHeplugin.jar:/spring/mapping-service/plugins/ApeHeplugin.jar --name mapping4docker ghcr.io/kit-data-manager/mapping-service:${{ matrix.versions.mapping-service }}
         echo "Waiting for mapping service to be healthy..."
         while true; do
           if ! docker ps | grep -q mapping4docker; then
@@ -84,35 +81,20 @@ jobs:
             echo "Service is running."
             break
           fi
-          echo "Waiting..."
+          echo "Waiting for the service to be ready ..."
           docker logs --tail 20 mapping4docker
           sleep 5
         done
 
-    - name: Install Hurl & Prepare JSON
-      run: |
-        curl -LO https://github.com/Orange-OpenSource/hurl/releases/download/6.0.0/hurl_6.0.0_amd64.deb
-        sudo dpkg -i hurl_6.0.0_amd64.deb
-        sudo apt install -y dos2unix
-
-        # Fetch mappingType dynamically
-        mappingType=$(curl -s http://localhost:8095/api/v1/mappingAdministration/types | jq -r '.[0].id')
-
-        echo "Using mappingType: $mappingType"
-
-        echo "{\"mappingId\":\"96\",\"mappingType\":\"$mappingType\",\"title\":\"apeHe from CI test\",\"description\":\"\",\"acl\":[]}" > record.json
-        echo '{"entry.title.value": "entry.title"}' > document.json
-
-        unix2dos -n ./mappingservice-plugin/integrationtests/basic.hurl ./mappingservice-plugin/integrationtests/basic_crlf.hurl
-
     - name: Run Tests with Hurl
       run: |
-        hurl --variable host=http://localhost:8095 --test ./mappingservice-plugin/integrationtests/basic_crlf.hurl --verbose --file-root .
+         curl --location --remote-name https://github.com/Orange-OpenSource/hurl/releases/download/6.0.0/hurl_6.0.0_amd64.deb
+         sudo dpkg -i hurl_6.0.0_amd64.deb
+         sudo apt install -y dos2unix
+         unix2dos -n ./mappingservice-plugin/integrationtests/basic.hurl ./mappingservice-plugin/integrationtests/basic_crlf.hurl
+         hurl --variable host=http://localhost:8095 --test ./mappingservice-plugin/integrationtests/basic_crlf.hurl --verbose --file-root .
       env:
         VERSION_OVERRIDE_BY_BRANCH: ${{ steps.extract_branch.outputs.branch }}
-
-    - name: Clean up temp files
-      run: rm -f record.json document.json
-
+        
     - name: Stop Docker Container
       run: docker stop mapping4docker
